@@ -32,7 +32,7 @@ export function MyGo() {
         if (head) setSelected([...selected, head]);
         setStarted('started');
         setInAGo(true);
-    }, [selected, setSelected, setRemaining, remaining, setStarted]);
+    }, [selected, setSelected, setRemaining, remaining, setStarted, setInAGo]);
 
     const giveUp = useCallback(async () => {
         await updateRecord('games', GAME_ID, {turn: ''});
@@ -70,7 +70,7 @@ export function MyGo() {
         });
         setInAGo(false);
 
-    }, [setStarted, wins, player]);
+    }, [setStarted, wins, player, setInAGo]);
 
     useEffect(() => {
         if (started === 'started' && remaining.length === 0 && selected.length === 0) {

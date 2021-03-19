@@ -1,4 +1,4 @@
-import React, {useCallback, useContext, useMemo, useReducer, useState} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 import faunadb, {query as q} from "faunadb"
 import {Collection, Status} from "../types";
 import {Suggestion} from "./State";
@@ -38,7 +38,7 @@ export function useFetch(fn) {
             setError(error);
             setLoaded(true);
         }
-    }, [setData, setStatus, setError, setLoaded]);
+    }, [setData, setStatus, setError, setLoaded, fn]);
 
     return useMemo(() => ({fetch, status, error, data, loaded} as {
         fetch: (...args) => void,

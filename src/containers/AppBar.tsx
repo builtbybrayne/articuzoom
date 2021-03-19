@@ -43,7 +43,7 @@ export function AppBar() {
             scores: newScores
         });
         await refetch()
-    }, [suggestions, setState, game, refetch]);
+    }, [suggestions, game, refetch]);
 
     const endGame = useCallback(async () => {
         await nextRound();
@@ -61,7 +61,7 @@ export function AppBar() {
     }, [setState, setViewOverride]);
     const viewScores = useCallback(() => {
         setViewOverride('scores');
-    }, [setState, setViewOverride]);
+    }, [setViewOverride]);
 
     if (!player || !game) {
         return <></>;

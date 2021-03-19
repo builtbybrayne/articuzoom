@@ -2,7 +2,7 @@ import React, {useCallback, useEffect} from 'react';
 import {atom, RecoilRoot, useRecoilState,} from 'recoil';
 import {Expand} from "../components/Expand";
 import {useLocalStorage} from "../utils";
-import {Dict, Status} from "../types";
+import {Status} from "../types";
 
 export function State({children}: React.PropsWithChildren<any>) {
     return <RecoilRoot>

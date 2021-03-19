@@ -8,7 +8,7 @@ import {useInterval} from "../utils";
 export function GameFetcher() {
     const [, setGame] = useRecoilState(gameState);
     const [, setGameFetch] = useRecoilState(gameFetchState);
-    const {data, fetch, status} = useFetch(useCallback(async () => {
+    const {fetch, status} = useFetch(useCallback(async () => {
         const {data = {}} = await getRecord('games', GAME_ID) as any;
         const _game = {
             ...EMPTY_GAME,
@@ -24,7 +24,6 @@ export function GameFetcher() {
             fetch();
         }
     }, [status, fetch]);
-    const [inAGo] = useRecoilState(inAGoState);
     useEffect(() => {
         setGameFetch({fetch, status});
     }, [setGameFetch, fetch, status]);
@@ -41,7 +40,7 @@ export function SuggestionsFetcher() {
     }, [setSuggestions]));
     useEffect(() => {
         setSuggestionsFetch({fetch, status, loaded, error});
-    }, [fetch, status, error, loaded]);
+    }, [fetch, status, error, loaded, setSuggestionsFetch]);
     useEffect(() => {
         fetch();
     }, [fetch]);

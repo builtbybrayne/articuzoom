@@ -1,8 +1,8 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 import {DataTable} from 'primereact/datatable';
 import {useRecoilState} from "recoil";
 import {playerState, suggestionsFetchState, suggestionsState, usePlayer} from "./State";
-import {createRecord, deleteRecord, resolveAllRecords, useFetch} from "./Fauna";
+import {createRecord, deleteRecord} from "./Fauna";
 import {Column} from "primereact/column";
 import {Card} from "primereact/card";
 import {Status} from "../types";
