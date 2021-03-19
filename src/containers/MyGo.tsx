@@ -72,6 +72,12 @@ export function MyGo() {
 
     }, [setStarted, wins, player, setInAGo]);
 
+    const bail = useCallback(() => {
+        const [head, ...tail] = [...remaining, ...selected];
+        setRemaining(tail);
+        setSelected([head]);
+    }, [remaining, setRemaining, selected, setSelected, start]);
+
     useEffect(() => {
         if (started === 'started' && remaining.length === 0 && selected.length === 0) {
             done();
@@ -111,6 +117,14 @@ export function MyGo() {
                     <Divider/>
                 </Section>
                 <Section>
+                    <Button label='Reject current options' icon='pi pi-ban' onClick={() => bail()} className='p-button-secondary' disabled={selected.length < 2 || !remaining.length}/>
+                </Section>
+                <Section>
+                    <Button icon='pi pi-step-forward' label='Give up' onClick={done} className='p-button-danger'/>
+                </Section>
+                <Section></Section>
+                <Divider/>
+                <Section>
                     <h2>Wins ({wins.length})</h2>
                     <WinBlock>
                         {wins.map(suggestion => <Win key={suggestion.id} suggestion={suggestion}/>)}
@@ -120,9 +134,6 @@ export function MyGo() {
                     <WinBlock>
                         <h3>Previous Wins: ({previousWins.length})</h3>
                     </WinBlock>
-                </Section>
-                <Section>
-                    <Button icon='pi pi-minus-circle' label='Give up' onClick={done} className='p-button-danger'/>
                 </Section>
             </>;
 
@@ -189,7 +200,7 @@ function Card({suggestion, children}: { suggestion: Suggestion, children?: JSX.E
 const WinBlock = styled.div`
   display: flex;
   flex-direction: row;
-  
+
 `;
 const WinStyle = styled.div`
   margin: 1rem;
@@ -201,7 +212,7 @@ function Win({suggestion}) {
 
 const Time = styled.div`
   margin: 0 auto;
-  padding: 2rem;  
+  padding: 2rem;
   width: 6rem;
   height: 6rem;
   background: hsl(100, 60%, 60%);
