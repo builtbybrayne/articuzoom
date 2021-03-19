@@ -10,22 +10,12 @@ import {useSetState} from "./Game";
 import {useRefetch} from "./DataFetchers";
 
 export function AppBar() {
-    const [player, setPlayer] = usePlayer();
+    const [player] = usePlayer();
     const refetch = useRefetch();
+    const setState = useSetState();
     const [game] = useRecoilState(gameState);
     const [suggestions] = useRecoilState(suggestionsState);
-    const setState = useSetState();
     const [viewOverride, setViewOverride] = useRecoilState(viewOverrideState);
-
-    const resetGame = useCallback(async () => {
-        await replaceRecord('games', GAME_ID, EMPTY_GAME);
-        await Promise.all(suggestions.map(async suggestion => {
-            await deleteRecord('suggestions', suggestion.id);
-        }));
-        await setState("");
-        await refetch();
-    }, [suggestions, setState, refetch]);
-    const [visibleSidebar, setVisibleSidebar] = useState(false);
 
     const nextRound = useCallback(async () => {
         await Promise.all(suggestions.map(async suggestion => {
@@ -33,14 +23,12 @@ export function AppBar() {
                 winner: ''
             });
         }));
-        const {scores={}, round} = game!;
-        const newScores = {
-            ...scores,
-            [round]: [...suggestions]
-        };
+        const {round} = game!;
         await updateRecord('games', GAME_ID, {
             round: round + 1,
-            scores: newScores
+            scores: {
+                [round]: [...suggestions]
+            }
         });
         await refetch()
     }, [suggestions, game, refetch]);
@@ -69,24 +57,65 @@ export function AppBar() {
 
     const topLeft = <>
         <AppBarButton icon='pi pi-list' label='Ideas' onClick={() => viewIdeas()} disabled={game?.state === 'started'}/>
-        <AppBarButton icon='pi pi-play' label='Game' onClick={() => goStart()} disabled={(viewOverride !== 'scores' && game?.state === 'started') || suggestions.length === 0}/>
-        <AppBarButton icon='pi pi-align-left' label='Scores' onClick={() => viewScores()} disabled={suggestions.length === 0} />
+        <AppBarButton icon='pi pi-sign-in' label='Game' onClick={() => goStart()} disabled={(viewOverride !== 'scores' && game?.state === 'started') || suggestions.length === 0}/>
+        <AppBarButton icon='pi pi-align-left' label='Scores' onClick={() => viewScores()} disabled={suggestions.length === 0}/>
     </>;
     const bottomRight = <>
-        <AppBarButton icon='pi pi-forward' label='Next Round' onClick={() => nextRound()} disabled={game?.turn}/>
-        <AppBarButton icon='pi pi-eject' label='End' onClick={() => endGame()} disabled={game?.turn}/>
+        <AppBarButton icon='pi pi-forward' label='Next Round' onClick={() => nextRound()} disabled={game?.turn} className='p-button-warning'/>
+        <AppBarButton icon='pi pi-eject' label='End' onClick={() => endGame()} disabled={game?.turn} className='p-button-danger'/>
     </>;
     const topRight = <>
-        <AppBarButton style={{marginLeft: '1rem'}} icon='pi pi-align-justify' onClick={() => setVisibleSidebar(true)}/>
+        <Admin />
     </>;
-    const bottomLeft = <h2>Round {game?.round}</h2>;
+    const bottomLeft = <h3 style={{margin: 0}}>Round {game?.round}</h3>;
     return <>
         <Toolbar left={topLeft} right={topRight}/>
         {game?.state === 'started' && viewOverride !== 'scores' && <Toolbar left={bottomLeft} right={bottomRight}/>}
-        <Sidebar visible={visibleSidebar} onHide={() => setVisibleSidebar(false)} position='right'>
-            <h5>{player}</h5>
+    </>;
+}
+
+function Admin() {
+    const [player, setPlayer] = usePlayer();
+    const [game] = useRecoilState(gameState);
+    const [visible, setVisible] = useState(false);
+    const [suggestions] = useRecoilState(suggestionsState);
+    const refetch = useRefetch();
+    const setState = useSetState();
+
+    const resetGame = useCallback(async () => {
+        await replaceRecord('games', GAME_ID, EMPTY_GAME);
+        await Promise.all(suggestions.map(async suggestion => {
+            await deleteRecord('suggestions', suggestion.id);
+        }));
+        await setState("");
+        await refetch();
+    }, [suggestions, setState, refetch]);
+
+
+    const {scores} = game || {};
+    const removeRound = useCallback(async (round) => {
+        if (scores) {
+            const newScores = {
+                ...scores,
+                [round]: null
+            };
+            await updateRecord('games', GAME_ID, {
+                scores: newScores
+            });
+        }
+    }, [scores]);
+    const roundRemovalButtons = scores ? Object.keys(scores).map(round => <SidebarButton className='p-button p-button-secondary' icon='pi pi-trash' onClick={() => removeRound(round)} label={`Delete round ${round}`}/>) : undefined;
+
+    return <>
+        <AppBarButton style={{marginLeft: '1rem'}} icon='pi pi-align-justify' onClick={() => setVisible(true)}/>
+        <Sidebar visible={visible} onHide={() => setVisible(false)} position='right' icons={() => (
+            <h5 style={{width: '100%', paddingLeft: '0.5rem'}}>{player}</h5>
+        )}>
             <SidebarButton icon='pi pi-sign-out' onClick={() => setPlayer('')} label="Logout"/>
-            <SidebarButton className='p-button p-button-danger' icon='pi pi-ban' onClick={() => resetGame()} label="Reset Game for Everyone"/>
+            <SidebarButton className='p-button p-button-danger' icon='pi pi-refresh' onClick={() => resetGame()} label="Delete all ideas and game state"/>
+
+            {roundRemovalButtons && roundRemovalButtons.length ? <h4>Rounds</h4> : undefined}
+            {roundRemovalButtons}
         </Sidebar>
     </>;
 }

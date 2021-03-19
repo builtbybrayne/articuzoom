@@ -5,7 +5,7 @@ import {DataTable} from "primereact/datatable";
 import {Dict} from "../types";
 import setProp from 'lodash.set';
 
-export function RoundScores({suggestions} : {suggestions: Suggestion[]}) {
+export function RoundScores({suggestions}: { suggestions: Suggestion[] }) {
     const data = useMemo(() => {
         const data: Dict<number> = {};
         suggestions.forEach(suggestion => {
@@ -18,14 +18,16 @@ export function RoundScores({suggestions} : {suggestions: Suggestion[]}) {
         return Object.entries(data).map(([name, count]) => ({name, count}));
     }, [suggestions]);
 
-    return data.length ? <DataTable value={data}>
-        <Column field="name" header="Player"/>
-        <Column field="count" header="Wins"/>
-    </DataTable> : <></>;
+    return <div className="p-shadow-1">
+        <DataTable value={data}>
+            <Column field="name" header="Player"/>
+            <Column field="count" header="Wins"/>
+        </DataTable>
+    </div>;
 }
 
-export function GameScores({game}: {game: GameType}) {
-    const {scores={}} = game;
+export function GameScores({game}: { game: GameType }) {
+    const {scores = {}} = game;
 
     const data = useMemo(() => {
         const data: Dict<Dict<number>> = {};
@@ -46,8 +48,10 @@ export function GameScores({game}: {game: GameType}) {
         });
     }, [scores]);
 
-    return <DataTable value={data}>
-        <Column field="name" header="Player"/>
-        {Object.keys(scores).map(round => <Column key={round} field={round} header={`Round ${round}`}/>)}
-    </DataTable>
+    return <div className="p-shadow-1">
+        <DataTable value={data}>
+            <Column field="name" header="Player"/>
+            {Object.keys(scores).map(round => <Column key={round} field={round} header={`Round ${round}`}/>)}
+        </DataTable>
+    </div>
 }

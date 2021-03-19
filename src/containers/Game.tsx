@@ -54,7 +54,7 @@ export function Game() {
     } else if (!game?.turn) {
         content = <>
             <Section>
-                <Button icon='pi pi-play' label="It's my turn" onClick={() => claimGo()}/>
+                <Button icon='pi pi-sign-in' label="It's my turn" onClick={() => claimGo()}/>
             </Section>
             <Section>
                 <RoundScores suggestions={suggestions}/>
@@ -62,7 +62,7 @@ export function Game() {
         </>
 
     } else if (game?.turn === player) {
-        content = <MyGo/>;
+        content = <MyGo/>
 
     } else {
         content = <div>It's {game.turn}'s go at the moment</div>

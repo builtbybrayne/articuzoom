@@ -86,20 +86,26 @@ export function MyGo() {
                 timeRef.current = Date.now() + 60000
             }
             return <>
-                <Countdown
-                    date={timeRef.current}
-                    autoStart={true}
-                    onComplete={() => done()}
-                />
                 <Section>
                     <CardBlock>
                         {selected.map(suggestion => <Card key={suggestion.id} suggestion={suggestion}>
-                            <Button label='Got it!' icon='pi pi-check' onClick={() => win(suggestion)}/>
+                            <Button label='Got it!' icon='pi pi-check' onClick={() => win(suggestion)} className='p-button-success'/>
                         </Card>)}
                     </CardBlock>
                 </Section>
                 <Section>
-                    <Button label='Pass' icon='pi pi-refresh' onClick={() => pass()} disabled={selected.length === 2 || !remaining.length} className='p-button-secondary'/>
+                    <Button label='Pass' icon='pi pi-refresh' onClick={() => pass()} disabled={selected.length === 2 || !remaining.length} className='p-button-warning'/>
+                </Section>
+                <Section>
+                    <Countdown
+                        date={timeRef.current}
+                        autoStart={true}
+                        onComplete={() => done()}
+                        renderer={({total}) => {
+                            const seconds = total / 1000;
+                            return <Time className='p-shadow-3' style={{background: `hsl(${100 * seconds / 60}, 60%, 60%)`}}>{total / 1000}</Time>;
+                        }}
+                    />
                 </Section>
                 <Section>
                     <Divider/>
@@ -129,7 +135,7 @@ export function MyGo() {
                     </WinBlock>
                 </Section>
                 <Section>
-                    <Button icon='pi pi-check' label='End go' onClick={done} />
+                    <Button icon='pi pi-check' label='End go' onClick={done}/>
                 </Section>
                 <Section>
                     <WinBlock>
@@ -188,9 +194,24 @@ const WinBlock = styled.div`
 const WinStyle = styled.div`
   margin: 1rem;
 `;
+
 function Win({suggestion}) {
     return <WinStyle>{suggestion.name}</WinStyle>
 }
+
+const Time = styled.div`
+  margin: 0 auto;
+  padding: 2rem;  
+  width: 6rem;
+  height: 6rem;
+  background: hsl(100, 60%, 60%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.66rem;
+  font-size: 4rem;
+  color: whitesmoke;
+`;
 
 
 function shuffle(a) {

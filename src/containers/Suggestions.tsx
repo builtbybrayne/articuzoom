@@ -39,11 +39,13 @@ export function Suggestions() {
         };
 
         content = <>
-            <DataTable value={mySuggestions} sortField="ts" sortOrder={-1}>
-                <Column field="name" header="My Ideas"/>
-                <Column field="actions" header="Actions" body={ActionButtons}/>
-            </DataTable>
-            <p style={{color: 'grey', marginTop: '2rem'}}>(You won't see other people's ideas)</p>
+            <div className="p-shadow-1">
+                <DataTable value={mySuggestions} sortField="ts" sortOrder={-1}>
+                    <Column field="name" header="My Ideas"/>
+                    <Column field="actions" header="Actions" body={ActionButtons}/>
+                </DataTable>
+            </div>
+            <p style={{color: 'grey', marginTop: '2rem', textAlign: 'center'}}>(You won't see other people's ideas)</p>
         </>
     }
 
