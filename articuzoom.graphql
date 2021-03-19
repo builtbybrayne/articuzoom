@@ -1,0 +1,26 @@
+type Game {
+    name: ID!
+    players: [GamePlayer]!
+    teams: [Team]!
+}
+
+type GamePlayer {
+    game: Game!
+    player: Player!
+}
+type Team {
+    game: Game!
+    name: ID!
+    players: [TeamPlayer]!
+}
+
+type TeamPlayer {
+    team: Team!
+    player: Player!
+}
+
+type Player {
+    name: ID!
+    game: GamePlayer
+    team: TeamPlayer
+}

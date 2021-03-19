@@ -1,0 +1,69 @@
+{
+  "name": "articuzoom",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@agility/content-fetch": "^1.1.1",
+    "@agility/content-management": "^0.1.9",
+    "@apollo/client": "^3.3.12",
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.1.0",
+    "@testing-library/user-event": "^12.1.10",
+    "@types/jest": "^26.0.15",
+    "@types/lodash.frompairs": "^4.0.6",
+    "@types/lodash.mapvalues": "^4.6.6",
+    "@types/lodash.set": "^4.3.6",
+    "@types/node": "^12.0.0",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "apollo-boost": "^0.4.9",
+    "case": "^1.6.3",
+    "faunadb": "^4.1.1",
+    "graphql": "^15.5.0",
+    "hookrouter": "^1.2.5",
+    "lodash.frompairs": "^4.0.1",
+    "lodash.mapvalues": "^4.6.0",
+    "lodash.set": "^4.3.2",
+    "primeicons": "^4.1.0",
+    "primereact": "^6.2.1",
+    "react": "^17.0.1",
+    "react-apollo-hooks": "^0.5.0",
+    "react-countdown": "^2.3.1",
+    "react-dom": "^17.0.1",
+    "react-scripts": "4.0.3",
+    "react-spinners": "^0.10.6",
+    "react-useinterval": "^1.0.2",
+    "realm-web": "^1.2.1",
+    "recoil": "^0.1.3",
+    "shortid": "^2.2.16",
+    "styled-components": "^5.2.1",
+    "typescript": "^4.1.2",
+    "use-fauna": "https://github.com/ryancharris/use-fauna",
+    "web-vitals": "^1.0.1",
+    "ys": "^0.3.5"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
