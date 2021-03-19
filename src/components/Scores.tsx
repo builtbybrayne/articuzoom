@@ -27,19 +27,21 @@ export function RoundScores({suggestions}: { suggestions: Suggestion[] }) {
 }
 
 export function GameScores({game}: { game: GameType }) {
-    const {scores = {}} = game;
+    const {scores} = game;
 
     const data = useMemo(() => {
         const data: Dict<Dict<number>> = {};
-        Object.entries(scores).forEach(([round, suggestions]) => {
-            suggestions.forEach(suggestion => {
-                const {winner} = suggestion;
-                if (winner) {
-                    const count = data[winner]?.[round] || 0;
-                    setProp(data, [winner, round], count + 1);
-                }
-            })
-        });
+        if (scores) {
+            Object.entries(scores).forEach(([round, suggestions]) => {
+                suggestions.forEach(suggestion => {
+                    const {winner} = suggestion;
+                    if (winner) {
+                        const count = data[winner]?.[round] || 0;
+                        setProp(data, [winner, round], count + 1);
+                    }
+                })
+            });
+        }
         return Object.entries(data).map(([name, counts]) => {
             return {
                 name,
@@ -51,7 +53,7 @@ export function GameScores({game}: { game: GameType }) {
     return <div className="p-shadow-1">
         <DataTable value={data}>
             <Column field="name" header="Player"/>
-            {Object.keys(scores).map(round => <Column key={round} field={round} header={`Round ${round}`}/>)}
+            {scores ? Object.keys(scores).map(round => <Column key={round} field={round} header={`Round ${round}`}/>) : undefined}
         </DataTable>
     </div>
 }

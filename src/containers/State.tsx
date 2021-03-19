@@ -53,13 +53,14 @@ export type GameType = {
     turn: string;
     state: GameState;
     round: number,
-    scores?: {[k: number]: Suggestion[]}
+    scores?: {[k: number]: Suggestion[]} | null
 }
-export const EMPTY_GAME = {
+export const EMPTY_GAME: GameType = {
     id: GAME_ID,
     turn: '',
     state: '',
-    round: 1
+    round: 1,
+    scores: null
 };
 export const gameState = atom<GameType | undefined>({
     key: 'game',
