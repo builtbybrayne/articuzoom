@@ -4,7 +4,6 @@ import {Column} from "primereact/column";
 import {DataTable} from "primereact/datatable";
 import {Dict} from "../types";
 import setProp from 'lodash.set';
-import getProp from 'lodash.get';
 
 export function RoundScores({suggestions}: { suggestions: Suggestion[] }) {
     const data = useMemo(() => {
