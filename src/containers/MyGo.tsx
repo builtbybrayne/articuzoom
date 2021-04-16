@@ -81,7 +81,7 @@ export function MyGo() {
         const [head, ...tail] = [...remaining, ...selected];
         setRemaining(tail);
         setSelected([head]);
-    }, [remaining, setRemaining, selected, setSelected, start]);
+    }, [remaining, setRemaining, selected, setSelected]);
 
     useEffect(() => {
         if (started === 'started' && remaining.length === 0 && selected.length === 0) {
