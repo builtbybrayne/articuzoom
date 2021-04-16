@@ -8,6 +8,7 @@ import {Button} from "primereact/button";
 import {updateRecord} from "./Fauna";
 import {Divider} from "primereact/divider";
 import {useRefetch} from "./DataFetchers";
+import {Time} from "../components/Time";
 
 export function MyGo() {
     const [player] = usePlayer();
@@ -21,21 +22,24 @@ export function MyGo() {
     const [wins, setWins] = useState<Suggestion[]>([]);
     const [started, setStarted] = useState<'' | 'started' | 'ended'>('');
 
+
     console.log('...STARTED', started);
     console.log('...REMAINING', remaining);
     console.log('...SELECTED', selected);
     console.log('...WINS', wins);
 
-    const start = useCallback(() => {
+    const start = useCallback(async () => {
         const [head, ...rest] = remaining;
         setRemaining(rest);
         if (head) setSelected([...selected, head]);
         setStarted('started');
         setInAGo(true);
+        timeRef.current = Date.now() + 60000;
+        await updateRecord('games', GAME_ID, {countdownTarget: timeRef.current});
     }, [selected, setSelected, setRemaining, remaining, setStarted, setInAGo]);
 
     const giveUp = useCallback(async () => {
-        await updateRecord('games', GAME_ID, {turn: ''});
+        await updateRecord('games', GAME_ID, {turn: '', countdownTarget: null});
         await refetch();
     }, [refetch]);
 
@@ -66,7 +70,8 @@ export function MyGo() {
             });
         }));
         await updateRecord('games', GAME_ID, {
-            turn: ''
+            turn: '',
+            countdownTarget: null
         });
         setInAGo(false);
 
@@ -88,9 +93,6 @@ export function MyGo() {
 
     switch (started) {
         case 'started':
-            if (!timeRef.current) {
-                timeRef.current = Date.now() + 60000
-            }
             return <>
                 <Section>
                     <CardBlock>
@@ -209,20 +211,6 @@ const WinStyle = styled.div`
 function Win({suggestion}) {
     return <WinStyle>{suggestion.name}</WinStyle>
 }
-
-const Time = styled.div`
-  margin: 0 auto;
-  padding: 2rem;
-  width: 6rem;
-  height: 6rem;
-  background: hsl(100, 60%, 60%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.66rem;
-  font-size: 4rem;
-  color: whitesmoke;
-`;
 
 
 function shuffle(a) {
