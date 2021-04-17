@@ -1,7 +1,7 @@
 import React, {useCallback, useMemo, useState} from 'react';
 import faunadb, {query as q} from "faunadb"
 import {Collection, Status} from "../types";
-import {Suggestion} from "./State";
+import {GAME_ID, GameType, Suggestion} from "./State";
 
 const FaunaContext = React.createContext<any>(null);
 
@@ -67,6 +67,14 @@ export async function createRecord(collection: Collection, data: object) {
 export async function updateRecord(collection: Collection, id: string, data: object) {
     console.log('Update', collection, id, data);
     return await client.query(q.Update(q.Ref(q.Collection(collection), id), {data}));
+}
+
+export async function updateSuggestion(id: string, suggestion: Partial<Suggestion>) {
+    return await updateRecord('suggestions', id, suggestion);
+}
+
+export async function updateGame(state: Partial<GameType>) {
+    return await updateRecord('games', GAME_ID, state);
 }
 
 export async function replaceRecord(collection: Collection, id: string, data: object) {

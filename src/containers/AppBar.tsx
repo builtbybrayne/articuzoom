@@ -3,7 +3,7 @@ import React, {useCallback, useState} from 'react';
 import {Toolbar} from "primereact/toolbar";
 import {EMPTY_GAME, GAME_ID, gameState, suggestionsState, usePlayer, viewOverrideState} from "./State";
 import {Button} from "primereact/button";
-import {deleteRecord, replaceRecord, updateRecord} from "./Fauna";
+import {deleteRecord, replaceRecord, updateGame, updateSuggestion} from "./Fauna";
 import {useRecoilState} from "recoil";
 import {Sidebar} from 'primereact/sidebar';
 import {useSetState} from "./Game";
@@ -19,12 +19,13 @@ export function AppBar() {
 
     const nextRound = useCallback(async () => {
         await Promise.all(suggestions.map(async suggestion => {
-            await updateRecord('suggestions', suggestion.id, {
+            await updateSuggestion(suggestion.id, {
                 winner: ''
             });
         }));
         const {round} = game!;
-        await updateRecord('games', GAME_ID, {
+        await updateGame({
+            turn: '',
             round: round + 1,
             scores: {
                 [round]: [...suggestions]
@@ -97,11 +98,12 @@ function Admin() {
         if (scores) {
             const newScores = {
                 ...scores,
-                [round]: null
+                [round]: []
             };
-            await updateRecord('games', GAME_ID, {
+            await updateGame({
                 scores: newScores
             });
+            // await refetch(); ??
         }
     }, [scores]);
     const roundRemovalButtons = scores ? Object.keys(scores).map(round => <SidebarButton className='p-button p-button-secondary' icon='pi pi-trash' onClick={() => removeRound(round)} label={`Delete round ${round}`}/>) : undefined;

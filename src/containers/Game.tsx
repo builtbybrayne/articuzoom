@@ -1,7 +1,7 @@
-import React, {useCallback, useMemo, useRef} from 'react';
-import {useRecoilState} from "recoil";
-import {GAME_ID, GameState, gameState, GameType, playerState, suggestionsState, viewOverrideState} from "./State";
-import {updateRecord} from "./Fauna";
+import React, {useCallback, useEffect, useRef} from 'react';
+import {atom, useRecoilState, useRecoilValue, useSetRecoilState} from "recoil";
+import {GameState, gameState, GameType, playerState, Suggestion, suggestionsState, viewOverrideState} from "./State";
+import {updateGame} from "./Fauna";
 import {Container, Section} from "../components/Container";
 import {Button} from "primereact/button";
 import {MyGo} from "./MyGo";
@@ -10,11 +10,16 @@ import {useRefetch} from "./DataFetchers";
 import Countdown from "react-countdown";
 import {Time} from "../components/Time";
 
+const RemainingState = atom<Suggestion[]| null>({
+    key: 'remainingState',
+    default: null
+});
+
 
 export function useUpdateGame() {
     const refetch = useRefetch();
     return useCallback(async (data: Partial<GameType>) => {
-        await updateRecord('games', GAME_ID, data);
+        await updateGame(data);
         await refetch();
     }, [refetch]);
 }
@@ -30,25 +35,40 @@ export function Game() {
     const [player] = useRecoilState(playerState);
     const [game] = useRecoilState(gameState);
     const [viewOverride] = useRecoilState(viewOverrideState);
+    const remaining = useRecoilValue(RemainingState);
 
-
+    console.log('======', game, remaining, player, viewOverride);
     let content;
     if (game?.state === 'ended' || viewOverride === 'scores') {
         content = <Ended game={game}/>;
 
+    } else if (remaining?.length === 0) {
+        content = <Complete />;
+
     } else if (!game?.turn) {
-        content = <Scores player={player} />
+        content = <ClaimGo player={player}/>
 
     } else if (game?.turn === player) {
-        content = <IsMyGo/>
+        content = <MyGo/>
 
     } else {
         content = <NotMyGo turn={game?.turn} countdownTarget={game?.countdownTarget} />
     }
 
     return <Container>
+        <SuggestionWatcher/>
         {content}
     </Container>
+}
+
+function SuggestionWatcher() {
+    const [suggestions] = useRecoilState(suggestionsState);
+    const setRemaining = useSetRecoilState(RemainingState);
+    useEffect(() => {
+        const remaining = suggestions.filter(suggestion => !suggestion.winner);
+        setRemaining(remaining);
+    }, [suggestions, setRemaining]);
+    return <></>;
 }
 
 function Ended({game}) {
@@ -58,17 +78,21 @@ function Ended({game}) {
     </>
 }
 
-function Complete({suggestions}) {
+function Complete() {
+    const [suggestions] = useRecoilState(suggestionsState);
+
     return <Section>
         <h3>Round complete</h3>
         <RoundScores suggestions={suggestions}/>
     </Section>
 }
 
-function Scores({player}) {
+function ClaimGo({player}) {
     const refetch = useRefetch();
     const claimGo = useCallback(async () => {
-        await updateRecord('games', GAME_ID, {turn: player});
+        await updateGame({
+            turn: player,
+        });
         await refetch();
     }, [refetch, player]);
 
@@ -84,23 +108,11 @@ function Scores({player}) {
 }
 
 
-function IsMyGo() {
-    const [suggestions] = useRecoilState(suggestionsState);
-    const remaining = useMemo(() => suggestions.filter(suggestion => !suggestion.winner), [suggestions]);
-
-    if (!remaining.length) {
-        return <Complete suggestions={suggestions}/>;
-    } else {
-        return <MyGo />;
-    }
-}
-
 
 function NotMyGo({turn, countdownTarget}) {
     const timeRef = useRef<number>(countdownTarget);
     timeRef.current = countdownTarget;
 
-    console.log('RERENDER', turn, countdownTarget);
     return <React.Fragment>
         <Section>
             <div>It's {turn}'s go at the moment</div>
@@ -120,7 +132,7 @@ function NotMyGo({turn, countdownTarget}) {
                     if (seconds < 0 ) {
                         seconds = 0;
                     }
-                    return <Time className='p-shadow-3' style={{background: `hsl(${100 * seconds / 60}, 60%, 60%)`}}>{total / 1000}</Time>;
+                    return <Time className='p-shadow-3' style={{background: `hsl(${100 * seconds / 60}, 60%, 60%)`}}>{seconds}</Time>;
                 }}
             />
         </Section>

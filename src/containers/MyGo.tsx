@@ -1,11 +1,11 @@
 import styled from 'styled-components';
 import {useRecoilState} from "recoil";
-import {GAME_ID, inAGoState, Suggestion, suggestionsState, usePlayer} from "./State";
+import {inAGoState, Suggestion, suggestionsState, usePlayer} from "./State";
 import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import Countdown from "react-countdown";
 import {Section} from "../components/Container";
 import {Button} from "primereact/button";
-import {updateRecord} from "./Fauna";
+import {updateGame, updateSuggestion} from "./Fauna";
 import {Divider} from "primereact/divider";
 import {useRefetch} from "./DataFetchers";
 import {Time} from "../components/Time";
@@ -35,11 +35,18 @@ export function MyGo() {
         setStarted('started');
         setInAGo(true);
         timeRef.current = Date.now() + 60000;
-        await updateRecord('games', GAME_ID, {countdownTarget: timeRef.current});
+        await updateGame({
+            state: 'started',
+            countdownTarget: timeRef.current
+        });
     }, [selected, setSelected, setRemaining, remaining, setStarted, setInAGo]);
 
     const giveUp = useCallback(async () => {
-        await updateRecord('games', GAME_ID, {turn: '', countdownTarget: null});
+        await updateGame({
+            state: 'started',
+            turn: '',
+            countdownTarget: null
+        });
         await refetch();
     }, [refetch]);
 
@@ -65,13 +72,14 @@ export function MyGo() {
     const done = useCallback(async () => {
         setStarted('ended');
         await Promise.all(wins.map(async win => {
-            await updateRecord('suggestions', win.id, {
+            await updateSuggestion(win.id, {
                 winner: player
             });
         }));
-        await updateRecord('games', GAME_ID, {
+        await updateGame({
             turn: '',
-            countdownTarget: null
+            countdownTarget: null,
+            state: 'started'
         });
         setInAGo(false);
 
@@ -111,7 +119,7 @@ export function MyGo() {
                         onComplete={() => done()}
                         renderer={({total}) => {
                             const seconds = total / 1000;
-                            return <Time className='p-shadow-3' style={{background: `hsl(${100 * seconds / 60}, 60%, 60%)`}}>{total / 1000}</Time>;
+                            return <Time className='p-shadow-3' style={{background: `hsl(${100 * seconds / 60}, 60%, 60%)`}}>{seconds}</Time>;
                         }}
                     />
                 </Section>
